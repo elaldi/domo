@@ -16,7 +16,7 @@ function debug_sql($sql, $message=NULL) {
 
 function ouvre_bdd() {
 	$servername = "localhost:8888";
-	$username = "solene";
+	$username = "root";
 	$password = "root";
 	$dbname = "Test";
 
