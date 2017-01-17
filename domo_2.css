@@ -1,0 +1,165 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+body { 
+  font-family:Oxygen, Arial, Helvetica, sans-serif;
+  color:#FFF;
+  background-color:#222;
+  font-size: 1.0em;
+}
+
+/* STRUCTURE */
+
+#pagewrap {
+	padding: 5px;
+	width: 100%;
+	margin: 20px auto;
+}
+header {
+	height: 100px;
+	padding: 0 15px;
+}
+#menu_bar {
+	width: 290px;
+	float: left;
+	padding: 5px 15px;
+	background: #2F2F2F;
+}
+
+#middle {
+	width: 600px; /* Account for margins + border values */
+	float: left;
+	padding: 5px 15px;
+	margin: 0px 5px 5px 5px;
+}
+
+#sidebar {
+	width: auto; /* 270px; */
+	max-width: 300px;
+	padding: 5px 15px;
+	float: left;
+	background: #2F2F2F;
+}
+footer {
+	clear: both;
+	padding: 5px 15px;
+	background: #2F2F2F;
+}
+
+/************************************************************************************
+MEDIA QUERIES
+*************************************************************************************/
+/* for 980px or less */
+@media screen and (max-width: 980px) {
+	
+	#pagewrap {
+		width: 94%;
+	}
+	#menu_bar {
+		width: 41%;
+		padding: 1% 4%;
+	}
+	#middle {
+		width: 41%;
+		padding: 1% 4%;
+		margin: 0px 0px 5px 5px;
+		float: right;
+	}
+	
+	#sidebar {
+		clear: both;
+		padding: 1% 4%;
+		width: auto;
+		float: none;
+	}
+
+	header, footer {
+		padding: 1% 4%;
+	}
+}
+
+/* for 700px or less */
+@media screen and (max-width: 600px) {
+
+	#menu_bar {
+		width: auto;
+		float: none;
+	}
+	
+	#middle {
+		width: auto;
+		float: none;
+		margin-left: 0px;
+	}
+	
+	#sidebar {
+		width: auto;
+		float: none;
+	}
+
+}
+
+/* for 480px or less */
+@media screen and (max-width: 480px) {
+
+	header {
+		height: auto;
+	}
+	h1 {
+		font-size: 2em;
+	}
+	#sidebar {
+		display: none;
+	}
+
+}
+
+
+#menu_bar {
+	background: #222;
+}
+#sidebar {
+	background: #2F2F2F;
+	color: #000;
+}
+header, #menu_bar, #middle, #sidebar {
+	margin-bottom: 5px;
+}
+
+#pagewrap, header, #menu_bar, #middle, #sidebar, footer {
+	border: solid 0px #ccc;
+}
+
+/* ----- menu ----- */
+
+#menu {
+  width: 100%;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  background: #222;
+}
+
+#menu li {
+  background: #2F2F2F;
+  color: red; /* #fff ; */
+  border: 0px solid #600 ;
+  margin-bottom: 1px ;
+}
+
+#menu li a {
+  display: block ;
+  background: #2F2F2F ;
+  color: #ccc ;
+  font: 1em Oxygen, Arial, Helvetica, sans-serif ;
+  line-height: 1em ;
+  text-align: center ;
+  text-decoration: none ;
+  padding: 22px 17px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: bold;
+}
+#menu li a:hover, #menu li a:focus, #menu li a:active {
+  background:#292929;
+  color: #fff
+}

@@ -1,0 +1,577 @@
+<html>
+<head>
+
+	<link rel="stylesheet" type="text/css" href="domo_2.css">
+
+	<script type="text/javascript" src="js/erreurs.js" ></script>
+	<script type="text/javascript" src="js/debug_dump.js" ></script>
+	<script type="text/javascript" src="js/request.js" ></script>
+	<script type="text/javascript" src="js/capteurs.js" ></script>
+	
+	<style>
+	canvas
+	{
+	    pointer-events: none;       /* make the canvas transparent to the mouse - needed since canvas is position infront of image */
+	    position: absolute;
+	}
+	</style>
+	
+	
+	<script>
+	
+		//**************************************************************************************************************
+		//**************************************************************************************************************
+
+		// Variables globales de navigation
+		
+		var modeActuel = "accueil";
+		
+		var lesMaisons = null;
+		var lesEtages = null;
+		var lesPieces = null;
+		var lesCapteurs = null;
+		
+		// Les identifiants courants
+		
+		var idMaison = null;		
+		var idEtage = null;
+		var idPiece = null;
+		var idCapteur = null;
+		
+		// Les 3 zones de visualisation
+		
+		var navZone = null;
+		var leftZone = null;
+		var centerZone = null;
+		var rightZone = null;
+		
+		// Met à jour la visualisation de la navigation
+		
+		function majNavigation(mode) {
+		
+			modeActuel = mode;
+		
+			var s = '<a onclick=window.location.reload(false)>Accueil</a>';
+			if (idMaison != null) {
+				s += ' &gt; ' + lesMaisons[idMaison]["nom"];
+			}
+			if (idEtage != null) {
+				s += ' &gt; ' + lesEtages[idEtage]["nom"];
+			}
+			if (idPiece != null) {
+				s += ' &gt; ' + lesPieces[idPiece]["nom"];
+			}
+			
+			
+			navZone.innerHTML = s;
+		}
+		
+		
+		
+		// Dump dans la zone de debug l'état des variables globales
+		
+		function dump_variables_globales(message) {
+			writeDebug('<b>&gt;&gt;&gt; dump des variables globales : ' + message + '</b><br/>');
+			writeDebug('Mode actuel : <i>' + modeActuel + '</i><br/>');
+			writeDebug('<ul>');
+			writeDebug('<li>idMaison: '  + idMaison  + '</li>');
+			writeDebug('<li>idEtage: '   + idEtage	 + '</li>');
+			writeDebug('<li>idPiece: '   + idPiece   + '</li>');
+			writeDebug('<li>idCapteur: ' + idCapteur + '</li>');
+			writeDebug('</ul>');
+		}
+		
+		//**************************************************************************************************************
+		//**************************************************************************************************************
+		// Gestion du canevas dessiné sur le plan d'un étage
+		
+		function getCanevasPlan() {
+			return document.getElementById("canevas_pieces");
+		}
+		function getHdcPlan() {
+			return getCanevasPlan().getContext('2d');
+		}
+
+		function drawPoly(coordStr)
+		{
+			var hdc = getHdcPlan();
+		    var mCoords = coordStr.split(',');
+		    var i, n;
+		    n = mCoords.length;
+		
+		    hdc.beginPath();
+		    hdc.moveTo(mCoords[0], mCoords[1]);
+		    for (i=2; i<n; i+=2)
+		    {
+		        hdc.lineTo(mCoords[i], mCoords[i+1]);
+		    }
+		    hdc.lineTo(mCoords[0], mCoords[1]);
+		    hdc.stroke();
+		}
+	
+		function drawRect(coordStr)
+		{
+			var hdc = getHdcPlan();
+		    var mCoords = coordStr.split(',');
+		    var top, left, bot, right;
+		    left = mCoords[0];
+		    top = mCoords[1];
+		    right = mCoords[2];
+		    bot = mCoords[3];
+		    hdc.strokeRect(left,top,right-left,bot-top); 
+		}
+		
+		// Dessine une pièce en mode souris dessus ou en mode selection
+		
+		function drawPiece(element, modeSelection=false) {
+		    var coordStr = element.getAttribute('coords');
+		    var areaType = element.getAttribute('shape');
+			var hdc = getHdcPlan();
+		    
+		    if (modeSelection) {
+			    hdc.fillStyle = 'red';
+			    hdc.strokeStyle = 'red';
+			    hdc.lineWidth = 3;
+		    } else {
+			    hdc.fillStyle = 'blue';
+			    hdc.strokeStyle = 'blue';
+			    hdc.lineWidth = 2;
+		    }
+		
+		    switch (areaType)
+		    {
+		        case 'polygon':
+		        case 'poly':
+		            drawPoly(coordStr);
+		            break;
+		
+		        case 'rect':
+		            drawRect(coordStr);
+		    }
+		}
+		
+		// Dessine deux pièces :
+		// - La pièce sur laquelle est la souris (si souris est non null)
+		// - la pièce sélectionnée
+		
+		function drawPieces(sourisElement=null) {
+		
+			// Efface tout
+			
+			hdc = getHdcPlan();
+		    var canvas = getCanevasPlan();
+		    
+		    // Efface l'affichage
+		    
+		    hdc.clearRect(0, 0, canvas.width, canvas.height);
+		    
+		    // Dessine la pièce de la souris
+		    
+		    if (sourisElement != null) {
+			    drawPiece(sourisElement, false);
+		    }
+		    if (idPiece != null) {
+		    	var element = document.getElementById("piece_" + idPiece);
+		    	drawPiece(element, true);
+		    }
+			
+		}
+		
+	
+		function sourisSurPiece(element) {
+			drawPieces(element);
+		}
+		
+		function clickSouris(element) {
+		
+			// Efface la sélection courante
+		    
+		    idPiece = null;
+		    drawPieces(element);
+			
+			// L'identifiant de l'élément piece est piece_xxx
+			// On récupère l'identifiant de la piece après le caractère _
+			
+		    var id = element.id.split("_")[1];
+		    selectPiece(id);
+		    
+		    
+		}
+	
+		function sourisSortPiece() {
+			drawPieces(null);
+		}
+		
+		
+		function initCanevasPieces()
+		{
+		    // get the target image
+		    var img = document.getElementById('plan');
+		
+		    var x,y, w,h;
+		
+		    // get it's position and width+height
+		    
+		    var r = img.getBoundingClientRect();
+		    x = r.left;
+		    y = r.top;
+		    w = img.clientWidth;
+		    h = img.clientHeight;
+		    
+		    //alert("x="+x +", y="+y +", left="+img.left +", top="+img.top);
+		
+		    // move the canvas, so it's contained by the same parent as the image
+		    var imgParent = img.parentNode;
+		    var can = getCanevasPlan();
+		    imgParent.appendChild(can);
+		
+		    // place the canvas in front of the image
+		    can.style.zIndex = 1;
+		    can.style.position = "absolute";
+		
+		    // position it over the image
+		    can.style.left = x+'px';
+		    can.style.top = y+'px';
+		
+		    // make same size as the image
+		    can.setAttribute('width', w+'px');
+		    can.setAttribute('height', h+'px');
+		}
+		
+		//**************************************************************************************************************
+		// Gestion du menu de gauche
+		
+		// Ecrit le titre du menu
+		
+		function ecritTitreMenu(libelle) {
+			var t = document.getElementById("menu_bar").querySelector("h2");
+			t.innerHTML = libelle;
+		}
+		
+		// Efface le menu
+		
+		function effaceMenu() {
+			var menu = document.getElementById("menu");
+			menu.innerHTML = "";
+		}
+		
+		// Ecrit une ligne de menu
+		
+		function ecritLigneMenu(libelle, fonction) {
+		
+			var s = "";
+			s += '<li onclick="' + fonction + '">';
+			s += '<a onclick="' + fonction + '">' + libelle + '</a>';
+			s += '</li>';
+		
+		
+			var menu = document.getElementById("menu");
+			menu.innerHTML += s;
+		}
+		
+		//**************************************************************************************************************
+		// Affiche un nouveau plan
+		
+		function affichePlan(nom) {
+		
+			image = document.getElementById("plan");
+		
+			if (nom == null) {
+				//image.style="display:none;";
+				image.src = "plans/noplan.jpg";
+			} else {
+				//image.style="display:inline;";
+				image.src = "plans/" + nom;
+				image.width = 600;
+				image.height = 400;
+			
+				// Mappage des pieces
+				
+				var map = document.getElementById("map_pieces");
+				
+				// Efface le mappage existant
+				map.innerHTML = "";
+				
+				// Ajoute les maps
+				for (id in lesPieces) {
+					var area = document.createElement( "AREA" );
+					area.id = "piece_" + id;
+					area.shape = "poly";
+					area.coords = lesPieces[id]["coord"];
+					
+					area.onmouseover = function() {sourisSurPiece(this);};
+					area.onmouseout = sourisSortPiece;
+					area.onclick = function() {clickSouris(this);};
+					
+					map.appendChild(area);
+				}
+			}
+			
+			// Met à jour le canevas
+			
+			initCanevasPieces();	
+		}
+		
+		//**************************************************************************************************************
+		// Les fonctions suivantes sont appellées en cliquant sur la page
+		
+		// Sélection d'une maison
+		
+		function selectMaison(id) {
+		
+			erreur_reset();	// Efface le message d'erreur éventuel
+		
+			idMaison 	= id;
+			idEtage 	= null;
+			idPiece 	= null;
+			idCapteur 	= null;
+			
+			appelServeur("etages", idMaison, modeSelectionEtage, document.getElementById("debug_area"));
+		}
+		
+		function selectEtage(id) {
+		
+			erreur_reset();	// Efface le message d'erreur éventuel
+			
+			idEtage 	= id;
+			idPiece 	= null;
+			idCapteur 	= null;
+			
+			appelServeur("pieces", idEtage, modeSelectionPiece, document.getElementById("debug_area"));
+		}
+		
+		function selectPiece(id) {
+			erreur_reset();	// Efface le message d'erreur éventuel
+			
+			idPiece 	= id;
+			idCapteur 	= null;
+			
+			appelServeur("capteurs", idPiece, modeSelectionCapteur, document.getElementById("debug_area"));
+		}
+		
+		
+		//**************************************************************************************************************
+		// Les fonctions suivantes sont appellées en retour de l'appel du serveur
+		// Elles mettent à jour l'affochage
+		
+		
+		// Mode sélection maison
+		// Mode de démarrage : affiche la liste des maisons disponibles
+		
+		function modeSelectionMaison(maisons) {
+		
+			erreur_reset();	// Efface le message d'erreur éventuel
+			
+			lesMaisons = maisons;
+			
+			// Navivation
+			
+			majNavigation("accueil");
+
+			//debug_dump(lesMaisons);
+			
+			// Menu des maisons disponibles
+			
+			effaceMenu();
+			
+			ecritTitreMenu("Maisons");
+
+			for (id in maisons) {
+				ecritLigneMenu(lesMaisons[id]["nom"], "selectMaison(" + id + ")");
+			}
+			
+			// Met à jour le pland avec rien dedans
+			
+			affichePlan(null);
+			
+			// Rien dans la zone des capteurs
+			
+			rightZone.innerHTML = "&nbsp;";
+			
+			//dump_variables_globales('modeSelectionMaison');
+		}
+		
+		// Mode sélection étage
+		// Lorsque l'utilisateur a cliqué que la maison, l'application appelle le serveur pour avoir la liste des étages
+		// Lorsque la liste des reçue, la fonction retour appelle modeSelectionEtage
+		
+		function modeSelectionEtage(etages) {
+		
+			erreur_reset();	// Efface le message d'erreur éventuel
+			
+			lesEtages = etages;
+			//debug_dump(lesEtages);
+			
+			// Navigation
+			
+			majNavigation("maison");
+			
+			// Le menus
+			
+			ecritTitreMenu(lesMaisons[idMaison]["nom"]);
+			effaceMenu();
+
+			for (id in lesEtages) {
+				if (idEtage == null) {
+					idEtage = id;
+				}
+				ecritLigneMenu(lesEtages[id]["nom"], "selectEtage(" + id + ")");
+			}
+			
+			
+			// On sélectionne par défaut le premier étage
+			
+			// debug_dump(idEtage);
+			if (idEtage == null) {
+				affichePlan(null);
+			} else {
+				selectEtage(idEtage);
+				//affichePlan(lesEtages[idEtage]["plan"]);
+			}
+			
+			// Rien dans la zone des capteurs
+			
+			rightZone.innerHTML = "&nbsp;";
+			
+			//dump_variables_globales('modeSelectionEtage');
+			
+			
+		}
+		
+		// Mode sélection pièce
+		
+		function modeSelectionPiece(pieces) {
+		
+			erreur_reset();	// Efface le message d'erreur éventuel
+			
+			// Navigation
+			
+			majNavigation("etage");
+			
+			
+			lesPieces = pieces;
+			//debug_dump(lesPieces);
+			
+			affichePlan(lesEtages[idEtage]["plan"]);
+			
+			// Aucune pièce sélectionnée : rien dans la zone des capteurs
+
+			rightZone.innerHTML = "&nbsp;";
+		}
+		
+		// Une pièce a été sélectionnée et on récupère son contenu
+		
+		function modeSelectionCapteur(capteurs) {
+			
+			erreur_reset();	// Efface le message d'erreur éventuel
+			modeActuel = "piece";
+			
+			lesCapteurs = capteurs;
+			//debug_dump(lesCapteurs);
+			
+			// Nom de la piece
+			
+			var s = "<h1>" + lesPieces[idPiece]["nom"] + "</h1>";
+			
+			// Liste des capteurs existants dans la pièce
+			// Crée le tableau avec les zones cibles à remplir avec l'affichage dynamique
+			
+			s += '<table id="capteurs">';
+			for (id in lesCapteurs) {
+				s += '<tr><td>';
+				s += '<h2>' + lesCapteurs[id]["nom"] + '</h2>';
+				
+				// La zone suivante sera remplie en allant chercher le code source sur le serveur
+				s += '<div id=affichage_' + lesCapteurs[id]["categorie"] + '_' + lesCapteurs[id]["numero"] + '></div>';
+				
+				s += '</td></tr>';
+			}
+			s += '</table>';
+			
+			rightZone.innerHTML = s;
+			
+			// Remplit les zones dynamiquement
+			
+			for (id in lesCapteurs) {
+				var elem = document.getElementById('affichage_' + lesCapteurs[id]["categorie"] + '_' + lesCapteurs[id]["numero"]);
+				demandeAffichageCapteur(lesCapteurs[id]["categorie"], lesCapteurs[id]["numero"], elem)
+			}
+			
+		}
+		
+		
+		//**************************************************************************************************************
+		//**************************************************************************************************************
+		
+		// Initialisation des variables globales
+		
+		function initGlobal() {
+			leftZone 	= document.getElementById("menu_bar");
+			centerZone 	= document.getElementById("middle");
+			rightZone 	= document.getElementById("sidebar");
+			navZone 	= document.getElementById("navigation");
+		}
+		
+		//**************************************************************************************************************
+		//**************************************************************************************************************
+		
+		// Initialisation de la page
+		
+		function initialisePage() {
+			//initDebug("debug_area");  // Mettre en commentaire pour activer le mode debug
+			initGlobal();
+			appelServeur("maisons", 1, modeSelectionMaison, document.getElementById("debug_area"));
+		}
+		
+		window.onload = initialisePage;
+		
+		//**************************************************************************************************************
+		//**************************************************************************************************************
+		
+	
+	</script>
+</head>
+<body>
+
+<canvas id='canevas_pieces'></canvas> <!-- gets re-positioned in myInit(); -->
+
+<div id="pagewrap">
+
+	<header>
+		<h1>Smart Building</h1>
+	</header>
+	
+	<section id="message_erreur" style:"display: none; "></section><!-- affiché en cas d'erreur -->
+	
+	<section id="navigation"></section>
+		
+	<section id="menu_bar">
+		<h2>Domotique</h2>
+		<ul id="menu">
+		</ul>
+	</section>
+	
+	<section id="middle">
+			<img src="plans/sm.png" alt="[plan étage]" id="plan" style="width=600px; height=400px" usemap="map_pieces"/>
+			<map name="map_pieces" id="map_pieces">
+			</map>
+	</section>
+
+	<aside id="sidebar"> &nbsp </aside>
+	
+	<footer>
+		<h4>Footer</h4>
+		<p>Footer text</p>
+        <div id=boutons>
+        <a href="gestion_base.php?parent=null&numero=null"><input type="button" value="Édition"/>&nbsp;
+        </div>
+	</footer>
+
+</div>
+
+<div id="debug_area" style="background-color: lightblue;">
+</div>
+
+
+</body>
+</html>
