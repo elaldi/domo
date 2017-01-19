@@ -2,7 +2,6 @@
 
 include "acces_bdd.php";
 $table = $_GET["table"];
-$parent = $_GET["parent"];
 
 // Debug
 
@@ -47,7 +46,6 @@ $sql .= ");";
 echo $sql . "<p>";
 
 exec_sql($sql);
-
 
 
 ?>

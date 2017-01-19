@@ -8,7 +8,7 @@
 // La fonction beurk est appellée si on n'arrive pas à joindre le serveur
 
 function beurk(a, b) {
-	erreur_message("Impossible de joindre le serveur : " + b);
+	erreur_message("Impossible de joindre le serveur : " + a);
 }
 
 
@@ -93,6 +93,5 @@ function simpleHttpRequest(url, retour) {
 function appelServeur(key, value, retour) {
 	writeDebugSepa();
 	writeDebug("Appel serveur: " + key + "=" + value);
-	//simpleHttpRequest("http://localhost/domo/serveur.php?" + key + "=" + value, retour);
 	simpleHttpRequest("serveur.php?" + key + "=" + value, retour);
 }

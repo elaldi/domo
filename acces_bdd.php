@@ -2,9 +2,8 @@
 
 $sql_debug = 1;
 
-
 function debug_sql($sql, $message=NULL) {
-	//global $sql_debug;
+	global $sql_debug;
 	if ($sql_debug) {
 		echo "<p><i>Debug SQL";
 		if ($message) {
@@ -15,10 +14,10 @@ function debug_sql($sql, $message=NULL) {
 }
 
 function ouvre_bdd() {
-	$servername = "localhost:8888";
+	$servername = "localhost";
 	$username = "root";
-	$password = "root";
-	$dbname = "Test";
+	$password = "smartbuilding";
+	$dbname = "test";
 
 	// Create connection
 	
@@ -95,79 +94,66 @@ function colonnes_table($table) {
 	
 	return $cols;
 }
-/*
+
 function etages_croissants($etages){
 	$vect = array();
 	$i=1;
 	$j=1;
 	$min=$etages[1]["niveau"];
-	echo $min;
-	$indice = 1;
 	while (count($etages)>0){
-		while($i<=count($etages)){
+		while(i<=count($etages)){
 			if ($etages[$i]["niveau"]<$min){
 				$min = $etages[$i]["niveau"];
 				$indice = $i;
 			}
 			$i+=1;
-			echo $i;
-			echo '</br>';
-			echo count($etages);
-			echo '</br>';
 		}
 	$vect[$j] = $etages[$indice];
-	echo 'indice = ' . $indice;
-	echo '</br>';
 	unset($etages[$indice]); 		
 	$i=1;
 	$j+=1;
 	print_r($vect);
-	echo '</br>';
-	print_r($etages);
 	}
 	return($vect);
 }
-
-$etages = array(
-		1 => array(
+/*
+$etages = [
+		1 => [
 			"maison" => 1,
 			"niveau" => 0,
 			"nom" => "1er étage",
 			"plan" => "plan0.jpg"
-		),
-		2 => array(
+		],
+		2 => [
 			"maison" => 2,
 			"niveau" => 0,
 			"nom" => "Rez de chaussée",
 			"plan" => "plan1.jpg"
-		),
-		3 => array(
+		],
+		3 => [
 			"maison" => 2,
 			"niveau" => 1,
 			"nom" => "Etage",
 			"plan" => "plan2.jpg"
-		),
-		4 => array(
+		],
+		4 => [
 			"maison" => 2,
 			"niveau" => 2,
 			"nom" => "Combles",
 			"plan" => "plan3.jpg"
-		),
-		5 => array(
+		],
+		5 => [
 			"maison" => 1,
 			"niveau" => 1,
 			"nom" => "2e étage",
 			"plan" => "plan3.jpg"
-		)
-	);
+		]
+	];
 
 echo count($etages);
-print_r($etages);
 print_r($etages[1]);
 unset($etages[1]);
 print_r($etages);
-echo '</br>';
-etages_croissants($etages);
 */
 
 //etages_croissants($etages);

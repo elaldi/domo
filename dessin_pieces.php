@@ -207,7 +207,7 @@ $image = $_GET["image"];
 		<input type="button" value="Effacer" onClick="reset(); " />&nbsp;
 		
 		<script>
-			loadImage(<?php echo $image ?>);
+			loadImage(<?php $image ?>);
 		</script>
 	</body>
 </html>

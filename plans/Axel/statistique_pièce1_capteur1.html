@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8"/>
+		<title>Temperature</title>
+        <link rel="stylesheet" href="cssCalendrier.css"/>
+        <script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+        <script src="https://code.highcharts.com/modules/exporting.js"></script>
+        <script type="text/javascript" src="jsSimpleDatePickr.js"></script>
+        <script type="text/javascript" src="jsSimpleDatePickrInit.js"></script>
+	</head>
+    
+	<body>
+        <button id="lectureCap1">Ativer capteur 1</button>
+        <button id="desCap1">Désactiver capteur 1</button>
+        <button id="lectureCap2">Ativer capteur 2</button>
+        <button id="desCap2">Désactiver capteur 2</button>
+        <div id="zone"></div>
+        <div id="container" style="min-width: 310px; height: 400px; margin: 0 auto"></div>
+        <p>Date de début : <input type="text" value="" name="date2" id="champ_date_Debut" size="12" maxlength="10"></p>
+        <div id="calendarMainDebut"></div>
+        <p>Date de fin : <input type="text" value="" name="date2" id="champ_date_Fin" size="12" maxlength="10"><em>   Pour que le graphique s'actualise automatiquement, ne pas remplir cette case.</em></eù></p>
+        <div id="calendarMainFin"></div>
+        <button id="selectionDate">Choisir ces dates</button>
+        <script type="text/javascript" src="index.js"></script>
+    </body>
+</html>

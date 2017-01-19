@@ -44,8 +44,7 @@ $etages = array();
 $resultat = exec_sql($sql);
 	while($row = $resultat->fetch_assoc()) {
 		foreach($row as $key => $value) {
-				//$etages[$row["numero"]][$key] = $value;
-				$etages[$i][$key] = $value;
+				$etages[$row["numero"]][$key] = $value;
 		}
 	$i+=1;	
 	}
@@ -107,8 +106,7 @@ $resultat = exec_sql($sql);
 		1 => [
 			"etage" => 1,
 			"nom" => "Palier",
-			"coord" => "382,348, 382,252, 276,252, 277,173, 380,175, 380,136, 221,134, 185,160, 186,196, 221,226, 218,345",
-			"parent" => 1
+			"coord" => "382,348, 382,252, 276,252, 277,173, 380,175, 380,136, 221,134, 185,160, 186,196, 221,226, 218,345"
 		],
 		2 => [
 			"etage" => 1,
@@ -225,7 +223,7 @@ $resultat = exec_sql($sql);
 				$s = $s.'"'.$v.'"';
 			}
 		}
-		$s = $s."}";
+		$s=$s.'}';
 		return $s;
 	}
 	
@@ -235,17 +233,18 @@ $resultat = exec_sql($sql);
 	function getEnfants($table, $idParent) {
 		
 		$sep = '{';
-		//$s = '';
-		
+		$s='';
 		foreach ($table as $id => $enfant) {
-			if ($enfant["parent"] != empty
-			if (is_null($idParent) || ($enfant["parent"] == $idParent)) {
-				
+			$indice = $enfant["parent"];
+//			echo $indice;
+//			echo '</br>';
+			if (is_null($idParent) || ($indice == $idParent)) {	
 				$s = $s.$sep;
 				$sep = ", ";
 				
 				$s = $s.'"'.$id.'":';
 				$s = $s.buildJson($enfant);
+				
 			}
 		}
 		if ($sep == "{") {
@@ -255,7 +254,7 @@ $resultat = exec_sql($sql);
 		}
 		return $s;
 	}
-	
+//	echo getEnfants($pieces,1);	
 /*	
 	function getEnfants($table, $nomParent, $idParent) {
 		
@@ -334,7 +333,10 @@ $resultat = exec_sql($sql);
 	//echo getEtages(1)."<br/>";
 	//echo getPieces(1)."<br/>";
 	//echo getCapteurs(1)."<br/>";
-	//echo getDetailCapteur(1);	
+	//echo getDetailCapteur(1);
+	
+	
+	
 	
 
 ?>

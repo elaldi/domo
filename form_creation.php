@@ -52,23 +52,6 @@ La table est : <?PHP echo $table; ?>;
 
 </form>
 
-<?php
-//LIEN POUR DESSINER UNE PIECE
-if ($table == "pieces"){
-	$sql = 'SELECT plan FROM etages WHERE numero=' . $parent;
-	$resultat = exec_sql($sql);
-	while($row = $resultat->fetch_assoc()) {
-		$image = $row["plan"];
-		$lien = 'dessin_pieces.php?image="' . $image . '"';
-		echo '<br />' ;
-		//echo '<a href=' . $lien . '> Dessiner pièce </a> ';
-	}
-	//echo '<a href=dessin_pieces.html > Dessiner pièce </a> ';
-}
-
-?>
-
-<a href=<?php echo $lien ?>><input type="button" value="Dessiner une pièce"/></a>&nbsp;
 
 
 

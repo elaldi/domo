@@ -111,18 +111,11 @@ while($row = $resultat->fetch_assoc()) {
 	//LIEN POUR MODIFIER
 	echo "\t";
 	$lien = 'form_modif_ligne.php?table=' . $table . '&numero=' . $row["numero"];
-	//echo '<a href=' . $lien . '> Modifier  </a> ' ;
-	?>
-	<a href=<?php echo $lien ?>><input type="button" value="Modifier"/></a>&nbsp;
-    <?php
+	echo '<a href=' . $lien . '> Modifier  </a> ' ;
 	//LIEN POUR SUPPRIMER
 	echo "\t";
 	$lien = 'supprimer_ligne.php?table=' . $table . '&numero=' . $row["numero"];
-	//echo '<a href=' . $lien . '> Supprimer </a> <br />' ;
-	?>
-	<a href=<?php echo $lien ?>><input type="button" value="Supprimer"/></a>&nbsp;
-    <?php
-	echo '<br />' ;
+	echo '<a href=' . $lien . '> Supprimer </a> <br />' ;
 }
 
 echo '<br />' ;
@@ -134,10 +127,20 @@ if ($parent == "null"){
 	$numero=1;
 }
 $lien = 'form_creation.php?table=' . $table . '&parent=' .$numero ;
-//echo '<a href=' . $lien . '> Ajouter </a> ';
-?>
-<a href=<?php echo $lien ?>><input type="button" value="Ajouter"/></a>&nbsp;
-<?php
+echo '<a href=' . $lien . '> Ajouter </a> ';
+
+//LIEN POUR DESSINER UNE PIECE
+if ($table == "pieces"){
+	/*$sql = 'SELECT plan FROM etages WHERE numero=' . $numero;
+	$resultat = exec_sql($sql);
+	while($row = $resultat->fetch_assoc()) {
+		$image = $row["plan"];
+		$lien = 'dessin_pieces.php?image=' . $image;
+		echo '<a href=' . $lien . '> Dessiner pièce </a> ';
+	*/
+	echo '<br />' ;
+	echo '<a href=dessin_pieces.html > Dessiner pièce </a> ';
+}
 
 
 /*

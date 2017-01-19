@@ -42,18 +42,7 @@ La table est : <?PHP echo $table; ?> et le numéro est <?PHP echo $numero; ?>
 		
 		$br = "";
 		
-		if ($key == "plan") {
-			
-			//echo '<img src="data:image/jpeg;base64,'.base64_encode( $value ).'"/>';
-			//echo "Plan plus tard...<br/>";
-			$sqlb = "SELECT libelle FROM sys_libelles WHERE nom_colonne = '" . $key . "';";
-			$resultat = exec_sql($sqlb);
-			$ligne = $resultat->fetch_assoc();
-			$joli_nom = $ligne["libelle"];
-			echo $joli_nom . ' : <input type="text"';
-			$br = "<br />";	
-		
-		} elseif ($key == "parent") {
+		if ($key == "parent") {
 			// On ne fait rien car on ne veut pas modifier le parent	
 		} else {
 			
@@ -89,7 +78,6 @@ $cols = colonnes_table($table);
 //foreach ($cols as $key => $value) {
 //	echo $value . '<p>';
 //}
-
 
 
 ?>
